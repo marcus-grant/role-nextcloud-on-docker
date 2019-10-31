@@ -1,2 +1,7 @@
 ---
 # tasks file for role-nextcloud-on-docker
+- include_tasks: nextcloud-db.yml
+- include_tasks: nextcloud-app-local.yml
+  when: nextcloud_primary_storage_type == 'local'
+- include_tasks: nextcloud-app-s3.yml
+  when: nextcloud_primary_storage_type == 's3'
