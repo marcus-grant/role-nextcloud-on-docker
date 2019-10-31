@@ -1,7 +1,7 @@
 ---
 # defaults file for role-nextcloud-on-docker
 nextcloud_primary_storage_type: local  # local|s3|nfs
-nextcloud_host_data_directory: /opt/nextcloud
+nextcloud_data_location: /opt/nextcloud
 nextcloud_docker_directory: /var/lib/docker/nextcloud
 nextcloud_db_user: nextcloud
 nextcloud_db_user_passwd: password # DONOT USE IN PRODUCTION

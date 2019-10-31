@@ -16,7 +16,7 @@
     #   - nextcloud
     volumes:
       - '{{ nextcloud_docker_directory }}:/var/www/html:rw'
-      - '{{ nextcloud_host_data_directory }}:/var/www/html/data:rw'
+      - '{{ nextcloud_data_location }}:/var/www/html/data:rw'
     ports:
       - '{{ nextcloud_app_port }}:80'
     env:
