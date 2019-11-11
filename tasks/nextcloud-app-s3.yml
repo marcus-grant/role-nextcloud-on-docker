@@ -8,17 +8,20 @@
 
 - name: nextcloud application docker container
   docker_container:
-    name: nextcloud-app
-    image: 'nextcloud:16'
+    name: next
+    image: 'nextcloud:17'
     pull: true
-    # TODO: verify that it works by linking to the db host
-    # links: 
-    #   - nextcloud
     volumes:
       - '{{ nextcloud_docker_directory }}:/var/www/html:rw'
       - '{{ nextcloud_data_location }}:/var/www/html/data:rw'
-    ports:
-      - '{{ nextcloud_app_port }}:80'
+    # TODO figure out the simplest multihost version
+    # ports:
+    #   - '{{ nextcloud_app_port }}:80'
+    networks:
+      - name: '{{ traefik_docker_network | default(bridge) }}'
+    networks_cli_compatible: true
+    links:
+      - nextdb
     env:
       MYSQL_DATABASE: 'nextcloud'
       MYSQL_USER: '{{ nextcloud_db_user }}'
@@ -27,12 +30,21 @@
       MYSQL_HOST: "{{ nextcloud_db_host | default('127.0.0.1') }}"
       NEXTCLOUD_DATA_DIR: '/var/www/html/data'
       # TODO: Investigate env var NEXTCLOUD_TRUSTED_DOMAIN
-      NEXTCLOUD_TRUSTED_DOMAINS: 'nextcloud.{{ nextcloud_domain }}'
+      # NEXTCLOUD_TRUSTED_DOMAINS: 'nextcloud.{{ nextcloud_domain }}'
+      NEXTCLOUD_TRUSTED_DOMAINS: '{{ nextcloud_trusted_domains }}'
     restart_policy: unless-stopped
-    memory: '{{ nextcloud_app_memory }}'
-    # TODO: Enable these with traefik
-    # labels:
-    #   traefik.backend: 'nextcloud'
-    #   traefik.frontend.rule: 'Host:nextcloud.{{ nextcloud_domain }}'
-    #   traefik.enable: '{{ nextcloud_traefik_enabled }}'
-    #   traefik.port: '80'
+    # memory: '{{ nextcloud_app_memory }}'
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.next.entrypoints: 'http'
+      traefik.http.routers.next.rule: 'Host(`next.{{ base_domain }}`)'
+      traefik.http.middlewares.next-https-redirect.redirectscheme.scheme:
+        'https'
+      traefik.http.routers.next.middlewares: 'next-https-redirect'
+      traefik.http.routers.next-secure.entrypoints: 'https'
+      traefik.http.routers.next-secure.rule: 'Host(`next.{{ base_domain }}`)'
+      traefik.http.routers.next-secure.tls: 'true'
+      traefik.http.routers.next-secure.tls.certresolver: 'http'
+      traefik.http.routers.next-secure.service: 'next'
+      traefik.http.services.next.loadbalancer.server.port: '80'
+      traefik.docker.network: '{{ traefik_docker_network }}'

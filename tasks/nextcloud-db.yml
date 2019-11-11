@@ -9,16 +9,22 @@
 
 - name: nextcloud mariadb docker container
   docker_container:
-    name: nextcloud-db
+    name: nextdb
     image: mariadb
     pull: true
+    # memory: '{{ nextcloud_db_memory }}'
     volumes:
       - '{{ nextcloud_docker_directory }}/db:/var/lib/mysql:rw'
+    # ports:
+    #   - '{{ nextcloud_db_port }}:3306'
+    networks:
+      - name: '{{ traefik_docker_network | default(bridge) }}'
+    # links:
+    #   - next
+    networks_cli_compatible: true
+    restart_policy: unless-stopped
     env:
       MYSQL_DATABASE: 'nextcloud'
       MYSQL_USER: '{{ nextcloud_db_user }}'
       MYSQL_PASSWORD: '{{ nextcloud_db_user_password }}'
       MYSQL_ROOT_PASSWORD: '{{ nextcloud_db_root_password }}'
-      MYSQL_HOST: "{{ nextcloud_db_host | default('127.0.0.1') }}"
-    restart_policy: unless-stopped
-    memory: '{{ nextcloud_db_memory }}'
