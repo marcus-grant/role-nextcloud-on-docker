@@ -5,6 +5,7 @@ In-Progress
 -----------
 
 - [ ] Configure for S3 primary storage
+- [ ] Figure out way to preseed config.php with the correct `objectStore` element
 
 
 Planning

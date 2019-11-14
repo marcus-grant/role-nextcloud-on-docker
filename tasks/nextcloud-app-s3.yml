@@ -1,10 +1,24 @@
 ---
+# - debug:
+#     msg: >
+#       db user: {{ nextcloud_db_user }}
+#       db pass: {{ nextcloud_db_user_passwd }}
+#       db pass: {{ nextcloud_db_root_passwd }}
 - name: nextcloud app docker directories exist
   file:
     path: '{{ item }}'
     state: directory
   loop:
     - '{{ nextcloud_docker_directory }}'
+    - '{{ nextcloud_docker_directory }}/config'
+
+# TODO: Figure out how to preseed the config.php file that has all configs
+# - name: template nextcloud app server config file
+#   template:
+#     force: true
+#     src: ../templates/config.php.j2
+#     dest: '{{ nextcloud_docker_directory }}/config/config.php'
+#     mode: 0600
 
 - name: nextcloud application docker container
   docker_container:
@@ -25,8 +39,8 @@
     env:
       MYSQL_DATABASE: 'nextcloud'
       MYSQL_USER: '{{ nextcloud_db_user }}'
-      MYSQL_PASSWORD: '{{ nextcloud_db_user_password }}'
-      MYSQL_ROOT_PASSWORD: '{{ nextcloud_db_root_password }}'
+      MYSQL_PASSWORD: '{{ nextcloud_db_user_passwd }}'
+      MYSQL_ROOT_PASSWORD: '{{ nextcloud_db_root_passwd }}'
       MYSQL_HOST: "{{ nextcloud_db_host | default('127.0.0.1') }}"
       NEXTCLOUD_DATA_DIR: '/var/www/html/data'
       # TODO: Investigate env var NEXTCLOUD_TRUSTED_DOMAIN
