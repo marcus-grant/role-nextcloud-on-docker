@@ -27,7 +27,7 @@
     pull: true
     volumes:
       - '{{ nextcloud_docker_directory }}:/var/www/html:rw'
-      - '{{ nextcloud_data_location }}:/var/www/html/data:rw'
+      # - '{{ nextcloud_data_location }}:/var/www/html/data:rw'
     # TODO figure out the simplest multihost version
     # ports:
     #   - '{{ nextcloud_app_port }}:80'
